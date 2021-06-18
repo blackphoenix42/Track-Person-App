@@ -8,6 +8,7 @@ const authReducer = (state, action) => {
         case 'add_error': return { ...state, errorMessage: action.payload }
         case 'signin': return { errorMessage: '', token: action.payload }
         case 'clear_error_message': return { ...state, errorMessage: '' }
+        case 'signout': return { token: null, errorMessage: '' }
         default: return state
     }
 }
@@ -27,7 +28,7 @@ const clearErrorMessage = dispatch => () => {
     dispatch({ type: 'clear_error_message' })
 }
 
-const signup = (dispatch) => async ({ email, password }) => {
+const signup = dispatch => async ({ email, password }) => {
     try {
         const response = await trackerApi.post('/signup', { email, password })
         await AsyncStorage.setItem('token', response.data.token)
@@ -39,7 +40,7 @@ const signup = (dispatch) => async ({ email, password }) => {
 }
 
 
-const signin = (dispatch) => async ({ email, password }) => {
+const signin = dispatch => async ({ email, password }) => {
     try {
         const response = await trackerApi.post('/signin', { email, password })
         await AsyncStorage.setItem('token', response.data.token)
@@ -51,11 +52,12 @@ const signin = (dispatch) => async ({ email, password }) => {
 }
 
 
-const signout = (dispatch) => {
-    return () => {
-        // try signout
-    }
+const signout = dispatch => async () => {
+    await AsyncStorage.removeItem('token')
+    dispatch({ type: 'signout' })
+    navigate('loginFlow')
 }
+
 
 
 
